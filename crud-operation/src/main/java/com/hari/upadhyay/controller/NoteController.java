@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hari.upadhyay.entity.Note;
 import com.hari.upadhyay.exception.ResourceNotFoundException;
-import com.hari.upadhyay.repository.NoteRepository;
+import com.hari.upadhyay.services.NoteService;
 
 import java.util.List;
 
@@ -14,43 +14,44 @@ import java.util.List;
 @RequestMapping("/notes")
 public class NoteController {
 
+	
 	@Autowired
-	NoteRepository noteRepository;
+	NoteService noteService;
 
 	@GetMapping("/")
 	public List<Note> getAllNotes() {
-		return noteRepository.findAll();
+		return noteService.findAll();
 	}
 
 	@PostMapping("/")
 	public Note createNote(@RequestBody Note note) {
-		return noteRepository.save(note);
+		return noteService.save(note);
 	}
 
 	@GetMapping("/{id}")
 	public Note getNoteById(@PathVariable(value = "id") Long noteId) {
-		return noteRepository.findById(noteId).orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
+		return noteService.findById(noteId).orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
 	}
 
 	@PutMapping("/{id}")
 	public Note updateNote(@PathVariable(value = "id") Long noteId, @RequestBody Note noteDetails) {
 
-		Note note = noteRepository.findById(noteId)
+		Note note = noteService.findById(noteId)
 				.orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
 
 		note.setTitle(noteDetails.getTitle());
 		note.setContent(noteDetails.getContent());
 
-		Note updatedNote = noteRepository.save(note);
+		Note updatedNote = noteService.save(note);
 		return updatedNote;
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteNote(@PathVariable(value = "id") Long noteId) {
-		Note note = noteRepository.findById(noteId)
+		Note note = noteService.findById(noteId)
 				.orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
 
-		noteRepository.delete(note);
+		noteService.delete(note);
 
 		return ResponseEntity.ok().build();
 	}
